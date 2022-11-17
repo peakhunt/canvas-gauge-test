@@ -68,6 +68,7 @@
 </template>
 
 <script>
+// import {  ipcRenderer } from 'electron'
 
 export default {
   name: 'App',

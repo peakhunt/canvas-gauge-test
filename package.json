@@ -16,6 +16,7 @@
     "canvas-gauges": "^2.1.7",
     "core-js": "^3.8.3",
     "gsap": "^3.11.3",
+    "sqlite3": "^5.1.2",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
     "vue2-canvas-gauges": "^0.0.0",
@@ -53,7 +54,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "ignorePatterns": ["gauge.min.*"],
+    "ignorePatterns": [
+      "gauge.min.*"
+    ],
     "rules": {
       "vue/multi-word-component-names": 0
     }

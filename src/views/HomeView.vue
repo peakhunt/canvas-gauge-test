@@ -210,6 +210,9 @@
               </v-row>
             </v-form>
           </v-card-text>
+          <v-card-actions>
+            <v-btn text color="teal accent-4" @click="getLogs()" > Get Logs </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
 
@@ -231,6 +234,7 @@
 import RadialGauge from 'vue2-canvas-gauges/src/RadialGauge'
 import LinearGauge from 'vue2-canvas-gauges/src/LinearGauge'
 import Compass from '@/components/Compass.vue'
+import { ipcRenderer } from 'electron'
 
 export default {
   name: 'Home',
@@ -487,6 +491,10 @@ export default {
         v = 0
       }
       this.gaugeValueSVG = v
+      ipcRenderer.invoke('appDB:addLog', {
+        time: this.getDateTime(),
+        value: v,
+      })
     },
     startSimulation() {
       let self = this
@@ -578,6 +586,57 @@ export default {
 
       self.isSimRunningSVG = false
     },
+    getDateTime() {
+      let now = new Date()
+      let year = now.getFullYear()
+      let month = now.getMonth() + 1
+      let day = now.getDate()
+      let hour = now.getHours()
+      let minute = now.getMinutes()
+      let second = now.getSeconds()
+      let msec = now.getMilliseconds()
+
+      if (month.toString().length == 1) {
+        month = '0' + month
+      }
+      if (day.toString().length == 1) {
+        day = '0' + day
+      }
+      if (hour.toString().length == 1) {
+        hour = '0' + hour
+      }
+      if (minute.toString().length == 1) {
+        minute = '0' + minute
+      }
+      if (second.toString().length == 1) {
+        second = '0' + second
+      }
+      if (msec.toString().length == 1) {
+        msec = '00' + msec
+      } else if (msec.toString().length == 2) {
+        msec = '0' + msec
+      }
+
+      var dateTime = year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second + ':' + msec;
+      return dateTime;
+    },
+    async getLogs() {
+      console.log('retrieving logs')
+      let { error, rows } = await ipcRenderer.invoke('appDB:getLogs')
+
+      if (error) {
+        console.log(`failed to get logs ${error}`)
+        return
+      }
+
+      console.log(`retrieving logs done ${rows.length}`)
+      let ndx = 1
+
+      rows.forEach((row) => {
+        console.log(`${ndx}:<${row.time}>, <${row.value}>`)
+        ndx += 1
+      })
+    }
   },
 }
 </script>
