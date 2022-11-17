@@ -103,10 +103,11 @@ export default {
   },
   deinit() {
     return new Promise((resolve, reject) => {
-      if (sqlite3DB != null) {
+      if (sqlite3DB == null) {
         return resolve();
       }
 
+      console.log('closing database')
       sqlite3DB.close(() => {
         resolve();
       });
