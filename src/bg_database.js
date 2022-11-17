@@ -1,4 +1,5 @@
 import { app, ipcMain } from 'electron'
+const log = require('electron-log')
 const sqlite3 = require('sqlite3')
 const path = require('path')
 
@@ -7,14 +8,14 @@ let sqlite3DB = null;
 
 function initDB() {
   const dbPath = path.join(app.getPath('userData'), 'app.db')
-  console.log(`### appDB:init ${dbPath}`)
+  log.info(`### appDB:init ${dbPath}`)
   return new Promise((resolve, reject) => {
     sqlite3DB = new sqlite3.Database(dbPath, (err) => {
       if (err) {
-        console.log(`### initDB failed in Database() ${dbPath}`)
+        log.error(`### initDB failed in Database() ${dbPath}`)
         return reject(err)
       }
-      console.log(`### initDB Database() success ${dbPath}`)
+      log.info(`### initDB Database() success ${dbPath}`)
       resolve()
     })
   })
@@ -22,13 +23,13 @@ function initDB() {
 
 function createTables() {
   return new Promise((resolve, reject) => {
-    console.log(`### createTables creating table`)
+    log.info(`### createTables creating table`)
     sqlite3DB.run('create table if not exists datalog (time text primary key, value number not null)', (err) => {
       if (err) {
-        console.log(`### createTables creating table failed ${err}`)
+        log.error(`### createTables creating table failed ${err}`)
         return reject(err)
       }
-      console.log(`### createTables creating table success`)
+      log.info(`### createTables creating table success`)
       resolve()
     })
   })
@@ -38,10 +39,10 @@ function cleanDBLogs() {
   return new Promise((resolve, reject) => {
     sqlite3DB.run('delete from datalog', (err) => {
       if (err) {
-        console.log(`### cleaning datalog failed ${err}`)
+        log.error(`### cleaning datalog failed ${err}`)
         return reject(err)
       }
-      console.log(`### database cleanup success`)
+      log.info(`### database cleanup success`)
       resolve()
     })
   })
@@ -51,7 +52,7 @@ function addLogToDB(log) {
   return new Promise((resolve, reject) => {
     sqlite3DB.run('insert into datalog(time, value) values (?, ?)',  [log.time, log.value], (err) => {
       if (err) {
-        console.log(`insert into datalog failed ${err}`)
+        log.error(`insert into datalog failed ${err}`)
         return reject(err)
       }
       resolve()
@@ -63,7 +64,7 @@ function getLogsFromDB() {
   return new Promise((resolve, reject) => {
     sqlite3DB.all('select * from datalog', (err, rows) => {
       if (err) {
-        console.log(`select from datalog failed ${err}`)
+        log.error(`select from datalog failed ${err}`)
         reject({ error: err, rows: undefined })
       }
       resolve( { error: undefined, rows })
@@ -107,7 +108,7 @@ export default {
         return resolve();
       }
 
-      console.log('closing database')
+      log.info('closing database')
       sqlite3DB.close(() => {
         resolve();
       });

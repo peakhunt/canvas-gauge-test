@@ -3,8 +3,19 @@
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import bg_database from './bg_database'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const log = require('electron-log')
+
+if (isDevelopment) {
+  log.transports.file.level = 'silly'
+  log.transports.console.level = 'silly'
+} else {
+  log.transports.file.level = 'debug'
+  log.transports.console.level = false
+}
+
+import bg_database from './bg_database'
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([

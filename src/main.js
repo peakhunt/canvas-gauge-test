@@ -5,22 +5,22 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import { ipcRenderer } from 'electron'
 
+const log = require('electron-log')
+
 Vue.config.productionTip = false;
 
 //
 // initialize sqlite3 database
 //
 (async () => {
-  console.log('appDB:init')
+  log.info('appDB:init')
   let err = await ipcRenderer.invoke('appDB:init')
 
   if (err) {
-    console.log(`error appDB:init ${err}`)
+    log.error(`error appDB:init ${err}`)
   }
-  console.log('appDB:init done')
+  log.info('appDB:init done')
 })()
-
-console.log('proceeding')
 
 new Vue({
   store,
